@@ -108,10 +108,10 @@ namespace std
     }
     time_t DataKeeper::addTime (time_t time, string& nextStation, TimeKeeper& timeKeeper, string& name)
     {
-	   string lineName = DataKeeper::getLineName(name,nextStation);
-           time_t endTime = time+dataKeep[lineName];
-           timeKeeper.addTimeLine(lineName,time);
-           return endTime;
+	string lineName = DataKeeper::getLineName(name,nextStation);
+        time_t endTime = time+dataKeep[lineName];
+        timeKeeper.addTimeLine(lineName,time);
+        return endTime;
     }
 
 } /* namespace std */
