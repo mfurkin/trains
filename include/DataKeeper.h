@@ -20,7 +20,6 @@ namespace std
 	map<string, int> instanceQtyKeep;
 	DataKeeper();
 	~DataKeeper ();
-//	time_t scheduleSecondStation(time_t aFirstStationTime, string& name);
     public:
 	DataKeeper(const DataKeeper& aKeeper) = delete;
 	DataKeeper& operator=(const DataKeeper&) = delete;

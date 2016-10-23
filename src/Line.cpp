@@ -61,17 +61,7 @@ int Line::getLength ()
 {
     return keeper.getData(name);
 }
-/*
-time_t Line::scheduleSecondStation (time_t aFirstStationTime)
-{
-    return keeper.scheduleSecondStation(aFirstStationTime,name);
-}
 
-int Line::checkTimes (time_t time1, time_t time2)
-{
-    return abs(time1-time2) >= getLength();
-}
-*/
 void Line::addMe (map<string, Line>& lines)
 {
     string st2 = getLineName(secondStation,firstStation);

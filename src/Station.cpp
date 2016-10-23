@@ -46,7 +46,6 @@ Station& Station::operator = (const Station& aStation)
 }
 int Station::operator == (const Station& aStation)
 {
-//  return name == aStation.name && getWaysQty() == aStation.getWaysQty();
     return name == aStation.name;
 }
 
@@ -54,13 +53,7 @@ int Station::getWaysQty () const
 {
     return keeper.getData(name);
 }
-/*
-time_t Station::scheduleSecondStation(Line aLine, time_t aTime)
-{
-//  return aLine.scheduleSecondStation(aTime);
-    return keeper.scheduleSecondStation(aTime,name);
-}
-*/
+
 int Station::checkOnStation (time_t aTime,TimeKeeper& timeKeeper)
 {
     return keeper.checkOnStation(aTime, timeKeeper, name);
@@ -72,14 +65,7 @@ int Station::checkOnLine (time_t time, string& stationName, TimeKeeper& timeKeep
 }
 
 time_t Station::addTime (time_t time, string& nextStation, TimeKeeper& timeKeeper)
-{/*
-    string lineName = Line::getLineName(name,nextStation);
-    string msg("after insert");
-
-    time_t endTime = lines[Line::getLineName(name,nextStation)].scheduleSecondStation(time);
-    timeKeeper.addTimeStations(name,nextStation,time);
-    return endTime;
-    */
+{
     return keeper.addTime(time,nextStation, timeKeeper,name);
 }
 

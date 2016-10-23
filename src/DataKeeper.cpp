@@ -113,12 +113,7 @@ namespace std
            timeKeeper.addTimeLine(lineName,time);
            return endTime;
     }
-    /*
-    time_t  DataKeeper::scheduleSecondStation (time_t aFirstStationTime, string& name)
-    {
-	return aFirstStationTime+dataKeep[name];
-    }
-*/
+
 } /* namespace std */
 
 
