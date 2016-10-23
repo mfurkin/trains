@@ -54,64 +54,33 @@ int Station::getWaysQty () const
 {
     return keeper.getData(name);
 }
-
+/*
 time_t Station::scheduleSecondStation(Line aLine, time_t aTime)
 {
-    return aLine.scheduleSecondStation(aTime);
-}
-
-int Station::checkOnStation (time_t aTime,TimeKeeper& timeKeeper)
-{
-    /*
-    rapidjson::Value value(rapidjson::kObjectType);
-    int num = 0;
-
-    num = timeKeeper.countFilter([aTime](TimeKeepingPair curPair)
-    {
-	return (curPair.second == aTime);
-    });
-    int waysQty = getWaysQty();
-    return (num<waysQty);*/
-    return keeper.checkOnStation(aTime, timeKeeper, name);
-}
-/*
-Line  Station::getLine(string& secondStationName, map<string,Line> lines)
-{
-    return lines[Line::getLineName(name,secondStationName)];
+//  return aLine.scheduleSecondStation(aTime);
+    return keeper.scheduleSecondStation(aTime,name);
 }
 */
-int Station::checkOnLine (time_t time, string& stationName, map<string, Line>& lines, TimeKeeper& timeKeeper)
+int Station::checkOnStation (time_t aTime,TimeKeeper& timeKeeper)
 {
-    /*
-    int result = 0;
-    string lineName = Line::getLineName(stationName,name);
-    result = timeKeeper.checkNone([time,&lineName](TimeKeepingPair curPair)->bool
-	{
-	    return (curPair.first == lineName) && (curPair.second == time);
-	});
-    if (result)
-    {
-	string lineName = Line::getLineName(name,stationName);
-	TimeKeepingRange thisLineSchedule = timeKeeper.getTimesStations(name,stationName);
-	Line thisLine = lines[lineName];
-	result =  all_of(thisLineSchedule.first,thisLineSchedule.second,[time,&thisLine,&lineName](pair<string,time_t> curPair)mutable->bool
-	    {
-		return thisLine.checkTimes(curPair.second,time);
-	    });
-    }
-    */
+    return keeper.checkOnStation(aTime, timeKeeper, name);
+}
+
+int Station::checkOnLine (time_t time, string& stationName, TimeKeeper& timeKeeper)
+{
     return keeper.checkOnLine(time,stationName,timeKeeper,name);
 }
 
-time_t Station::addTime (time_t time, string& nextStation, map<string, Line>& lines, TimeKeeper& timeKeeper)
-{
+time_t Station::addTime (time_t time, string& nextStation, TimeKeeper& timeKeeper)
+{/*
     string lineName = Line::getLineName(name,nextStation);
     string msg("after insert");
 
     time_t endTime = lines[Line::getLineName(name,nextStation)].scheduleSecondStation(time);
-//  time_t endTime = getLine(nextStation,lines).scheduleSecondStation(time);
     timeKeeper.addTimeStations(name,nextStation,time);
     return endTime;
+    */
+    return keeper.addTime(time,nextStation, timeKeeper,name);
 }
 
 void Station::addMe (map<string, Station>& aMap)
@@ -123,13 +92,6 @@ void Station::saveMe(rapidjson::Value& array, function<void(rapidjson::Value&, s
 {
     aDataSaver(array,name,getWaysQty());
 }
-/*
-int Station::checkStation (int num)
-{
-    int waysQty = getWaysQty();
-    return (num<waysQty);
-}
-*/
 
 
 } /* namespace std */

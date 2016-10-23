@@ -106,10 +106,19 @@ namespace std
 	strcat(buf,aSecond.c_str());
 	return string(buf);
     }
-
+    time_t DataKeeper::addTime (time_t time, string& nextStation, TimeKeeper& timeKeeper, string& name)
+    {
+	   string lineName = DataKeeper::getLineName(name,nextStation);
+           time_t endTime = time+dataKeep[lineName];
+           timeKeeper.addTimeLine(lineName,time);
+           return endTime;
+    }
+    /*
     time_t  DataKeeper::scheduleSecondStation (time_t aFirstStationTime, string& name)
     {
 	return aFirstStationTime+dataKeep[name];
     }
-
+*/
 } /* namespace std */
+
+

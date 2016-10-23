@@ -27,7 +27,7 @@ public:
     Line (const string& aFirstStation, const string& aSecondStation, int aLength);
     static string getLineName(string& aFirst, string& aSecond);
     Line& operator =(const Line& aLine);
-    time_t scheduleSecondStation(time_t aFirstStationTime);
+//  time_t scheduleSecondStation(time_t aFirstStationTime);
     int checkTimes(time_t time1, time_t time2);
     void addMe(map<string, Line>& lines);
     void saveMe(rapidjson::Value& array, function<void(rapidjson::Value& array, string&, string&, int)> aDataSaver);

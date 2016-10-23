@@ -65,9 +65,9 @@ namespace std {
 	    {
 		bool res2;
 		Station secondStation = aStations[secondStationName];
-		res2 = secondStation.checkOnLine(curTime,firstStationName,lines,timeKeeper);
+		res2 = secondStation.checkOnLine(curTime,firstStationName,timeKeeper);
 		if (res2)
-		    curTime = firstStation.addTime(curTime,secondStationName,lines,timeKeeper);
+		    curTime = firstStation.addTime(curTime,secondStationName,timeKeeper);
 		result = res2;
 	    }
 	}
