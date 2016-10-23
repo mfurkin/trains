@@ -46,7 +46,8 @@ Station& Station::operator = (const Station& aStation)
 }
 int Station::operator == (const Station& aStation)
 {
-    return name == aStation.name && getWaysQty() == aStation.getWaysQty();
+//  return name == aStation.name && getWaysQty() == aStation.getWaysQty();
+    return name == aStation.name;
 }
 
 int Station::getWaysQty () const
@@ -61,6 +62,7 @@ time_t Station::scheduleSecondStation(Line aLine, time_t aTime)
 
 int Station::checkOnStation (time_t aTime,TimeKeeper& timeKeeper)
 {
+    /*
     rapidjson::Value value(rapidjson::kObjectType);
     int num = 0;
 
@@ -69,7 +71,8 @@ int Station::checkOnStation (time_t aTime,TimeKeeper& timeKeeper)
 	return (curPair.second == aTime);
     });
     int waysQty = getWaysQty();
-    return (num<waysQty);
+    return (num<waysQty);*/
+    return keeper.checkOnStation(aTime, timeKeeper, name);
 }
 /*
 Line  Station::getLine(string& secondStationName, map<string,Line> lines)
@@ -79,6 +82,7 @@ Line  Station::getLine(string& secondStationName, map<string,Line> lines)
 */
 int Station::checkOnLine (time_t time, string& stationName, map<string, Line>& lines, TimeKeeper& timeKeeper)
 {
+    /*
     int result = 0;
     string lineName = Line::getLineName(stationName,name);
     result = timeKeeper.checkNone([time,&lineName](TimeKeepingPair curPair)->bool
@@ -95,7 +99,8 @@ int Station::checkOnLine (time_t time, string& stationName, map<string, Line>& l
 		return thisLine.checkTimes(curPair.second,time);
 	    });
     }
-    return result;
+    */
+    return keeper.checkOnLine(time,stationName,timeKeeper,name);
 }
 
 time_t Station::addTime (time_t time, string& nextStation, map<string, Line>& lines, TimeKeeper& timeKeeper)
@@ -118,13 +123,13 @@ void Station::saveMe(rapidjson::Value& array, function<void(rapidjson::Value&, s
 {
     aDataSaver(array,name,getWaysQty());
 }
-
+/*
 int Station::checkStation (int num)
 {
     int waysQty = getWaysQty();
     return (num<waysQty);
 }
-
+*/
 
 
 } /* namespace std */

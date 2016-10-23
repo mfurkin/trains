@@ -39,7 +39,7 @@ public:
 	time_t addTime(time_t time, string& nextStation, map<string, Line>& lines, TimeKeeper& timeKeeper);
 	void addMe(map<string,Station>& aMap);
 	void saveMe(rapidjson::Value& array, function<void(rapidjson::Value&, string&, int)> aDataSaver);
-	int checkStation(int num);
+//	int checkStation(int num);
     };
 
 } /* namespace std */

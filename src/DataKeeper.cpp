@@ -8,6 +8,7 @@
 #include <DataKeeper.h>
 #include <algorithm>
 #include <functional>
+#include "rapidjson/Document.h"
 #include "KeyAlreadyExistsException.h"
 
 namespace std
@@ -54,6 +55,39 @@ namespace std
 	}
     }
 
+    int DataKeeper::checkOnLine (time_t time, string& stationName, TimeKeeper& timeKeeper, string& name)
+    {
+	 int result = 0;
+	    string lineName = DataKeeper::getLineName(stationName,name);
+	    result = timeKeeper.checkNone([time,&lineName](TimeKeepingPair curPair)->bool
+		{
+		    return (curPair.first == lineName) && (curPair.second == time);
+		});
+	    if (result)
+	    {
+		TimeKeepingRange thisLineSchedule = timeKeeper.getTimesStations(name,stationName);
+		int length = dataKeep[DataKeeper::getLineName(name,stationName)];
+		result =  all_of(thisLineSchedule.first,thisLineSchedule.second,[time,length](pair<string,time_t> curPair)mutable->bool
+		    {
+			return abs(curPair.second-time) >= length;
+		    });
+	    }
+	    return result;
+    }
+
+    int DataKeeper::checkOnStation (time_t aTime, TimeKeeper& timeKeeper, string& name)
+    {
+	rapidjson::Value value(rapidjson::kObjectType);
+	int num = 0;
+
+	num = timeKeeper.countFilter([aTime](TimeKeepingPair curPair)
+	{
+	    return (curPair.second == aTime);
+	});
+	int waysQty = dataKeep[name];
+	return (num<waysQty);
+    }
+
     int DataKeeper::getData (const string& name)
     {
 	return dataKeep[name];
@@ -62,6 +96,20 @@ namespace std
 
     DataKeeper::~DataKeeper ()
     {
+    }
+
+    string  DataKeeper::getLineName (string& aFirst, string& aSecond)
+    {
+	char* buf = new char [aFirst.length()+aSecond.length()+3];
+	strcpy(buf,aFirst.c_str());
+	strcat(buf,"->");
+	strcat(buf,aSecond.c_str());
+	return string(buf);
+    }
+
+    time_t  DataKeeper::scheduleSecondStation (time_t aFirstStationTime, string& name)
+    {
+	return aFirstStationTime+dataKeep[name];
     }
 
 } /* namespace std */

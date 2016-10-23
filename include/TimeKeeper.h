@@ -7,6 +7,7 @@
 
 #ifndef TIMEKEEPER_H_
 #define TIMEKEEPER_H_
+#include <functional>
 #include <map>
 #include <string>
 #include <time.h>

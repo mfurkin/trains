@@ -5,7 +5,7 @@
  *      Author: mfurkin
  */
 
-#include "JsonExchanger.h"
+
 #include <vector>
 #include <fstream>
 #include <cstring>
@@ -16,6 +16,7 @@
 #include "rapidjson/allocators.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
+#include "JsonExchanger.h"
 #include "KeyAlreadyExistsException.h"
 namespace std {
 

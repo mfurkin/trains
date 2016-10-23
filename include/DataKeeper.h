@@ -8,6 +8,7 @@
 #ifndef STATIONKEEPER_H_
 #define STATIONKEEPER_H_
 #include <map>
+#include "TimeKeeper.h"
 namespace std
 {
 
@@ -23,10 +24,14 @@ namespace std
 	DataKeeper(const DataKeeper& aKeeper) = delete;
 	DataKeeper& operator=(const DataKeeper&) = delete;
 	static DataKeeper& getKeeper();
+	static string getLineName(string& aFirst, string& aSecond);
 	int exists(string& name);
 	void add(string& name, int waysQty);
 	void copy(string& name);
 	void remove(string& name);
+	int checkOnLine(time_t time, string& secondStationName, TimeKeeper& timeKeeper,string& name);
+	int checkOnStation(time_t aTime, TimeKeeper& timeKeeper, string& name);
+	time_t scheduleSecondStation(time_t aFirstStationTime, string& name);
 	int getData(const string& name);
     };
 
