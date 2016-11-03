@@ -4,7 +4,7 @@
  *  Created on: 17 ???. 2016 ?.
  *      Author: mfurkin
  */
-
+#include <boost/filesystem.hpp>
 #include <iostream>
 #include <vector>
 #include "JsonExchanger.h"
@@ -13,15 +13,21 @@
 
 namespace std
 {
-
-    SchedulerTest::SchedulerTest ():json(), readError([](TrainObjectCreatingException& toce)
-					    {
-						assert(false);
-					    })
+/*
+    string SchedulerTest::TEST1_NAME = string("test1_failOnLine");
+    string SchedulerTest::TEST2_NAME = string("test2_failOnStation");
+    string SchedulerTest::TEST3_NAME = string("test3_OKstartersTooMuch");
+    string SchedulerTest::TEST4_NAME = string("test4_FailSameLineSameTime");
+    string SchedulerTest::TEST5_NAME = string("test5_OKFinishersTooMuch");
+    string SchedulerTest::TEST6_NAME = string("test6_failOnShortRout");
+    string SchedulerTest::TEST7_NAME = string("test7_OKMeetingOnStation");
+*/
+//  SchedulerTest::SchedulerTest ():json(), readError([](TrainObjectCreatingException& toce)
+    SchedulerTest::SchedulerTest ()
     {
 
     }
-
+/*
     vector<Station>  SchedulerTest::getStations (string& fname, function<vector<Station>()> defaultDataCreator)
     {
 	vector<Station> result;
@@ -64,29 +70,36 @@ namespace std
 	}
 	return result;
     }
+*/
+    void SchedulerTest::runTest (vector<Station> stations, vector<Line> lines, vector<Rout> routs, bool expected_result, string& test_name)
+    {
+	bool result;
+	cout<<"test "<<test_name<<" started\n";
+	Scheduler scheduler(stations,lines,routs);
+	result = scheduler.schedule();
+	cout<<"SchedulerTest::runTest result="<<result<<"\n";
+	assert(result==expected_result);
+	cout<<"test "<<test_name<<" passed\n";
+    }
 
     SchedulerTest::~SchedulerTest ()
     {
 
     }
-
-    void SchedulerTest::test1_failOnLine ()
+/*
+    void  SchedulerTest::test1_failOnLine(string& stations_fname, string& lines_fname, string& routs_fname)
     {
-	int result;
 	cout<<"test1 enter\n";
 	vector<Station> stations(4);
-        string stations_fname("D:\\tmp3\\test1\\test1_stations.txt");
         vector<Line> lines(5);
-        string lines_fname("D:\\tmp3\\test1\\test1_net.txt");
         vector<Rout> routs(3);
-        string routs_fname("D:\\tmp3\\test1\\test1_routs.txt");
         function<vector<Station>()> stationsCreator = []()-> vector<Station>
         {
-        	vector<Station> stations(4);
-        	stations[0] = Station("A",2);
-        	stations[1] = Station("B",2);
-        	stations[2] = Station("C",3);
-        	stations[3] = Station("D",2);
+            vector<Station> stations(4);
+            stations[0] = Station("A",2);
+            stations[1] = Station("B",2);
+            stations[2] = Station("C",3);
+            stations[3] = Station("D",2);
 	    return stations;
         };
         stations = getStations(stations_fname,stationsCreator);
@@ -118,23 +131,14 @@ namespace std
             return routs;
         };
         routs = getRoutsList(routs_fname,routsCreator);
-
-        Scheduler scheduler(stations,lines,routs);
-        result = scheduler.schedule();
-
-        cout<<"test1 exit result="<<result<<"\n";
-        assert(result==false);
+        runTest(stations,lines,routs,false,TEST1_NAME);
     }
-    void SchedulerTest::test2_failOnStation ()
-    {
-	int result;
-	vector<Station> stations(4);
 
-	string stations_fname("D:\\tmp3\\test2\\test2_stations.txt");
+    void SchedulerTest::test2_failOnStation(string& stations_fname, string& lines_fname, string& routs_fname)
+    {
+	vector<Station> stations(4);
 	vector<Line> lines(5);
-	string lines_fname("D:\\tmp3\\test2\\test2_net.txt");
 	vector<Rout> routs(3);
-	string routs_fname("D:\\tmp3\\test2\\test2_routs.txt");
 
 	function<vector<Station>()> stationsCreator = []()->vector<Station>
 	{
@@ -175,23 +179,14 @@ namespace std
             return routs;
         };
 	routs = getRoutsList(routs_fname,routsCreator);
-
-	Scheduler scheduler(stations,lines,routs);
-
-	result = scheduler.schedule();
-	cout<<"test2 exit result="<<result<<"\n";
-	assert(result==false);
+	runTest(stations,lines,routs,false,TEST2_NAME);
     }
 
-    void SchedulerTest::test3_OKstartersTooMuch ()
+    void SchedulerTest::test3_OKstartersTooMuch(string& stations_fname, string& lines_fname, string& routs_fname)
     {
-	int result;
 	vector<Station> stations(4);
-	string stations_fname("D:\\tmp3\\test3\\test3_stations.txt");
 	vector<Line> lines(5);
-	string lines_fname("D:\\tmp3\\test3\\test3_net.txt");
 	vector<Rout> routs(3);
-	string routs_fname("D:\\tmp3\\test3\\test3_routs.txt");
 	function<vector<Station>()> stationsCreator = []()->vector<Station>
 	{
 	    vector<Station> stations(4);
@@ -229,20 +224,14 @@ namespace std
 	    return routs;
 	};
 	routs = getRoutsList(routs_fname,routsCreator);
-	Scheduler scheduler(stations,lines,routs);
-	result = scheduler.schedule();
-	cout<<"test3 exit result="<<result<<"\n";
-	assert(result==true);
+	runTest(stations,lines,routs,true,TEST3_NAME);
     }
-    void SchedulerTest::test4_FailSameLineSameTime ()
+
+    void SchedulerTest::test4_FailSameLineSameTime(string& stations_fname, string& lines_fname, string& routs_fname)
     {
-	int result;
 	vector<Station> stations(4);
-	string stations_fname("D:\\tmp3\\test4\\test4_stations.txt");
 	vector<Line> lines(5);
-	string lines_fname("D:\\tmp3\\test4\\test4_net.txt");
 	vector<Rout> routs(3);
-	string routs_fname("D:\\tmp3\\test4\\test4_routs.txt");
 	function<vector<Station>()> stationsCreator = []()->vector<Station>
 	{
 	    vector<Station> stations(4);
@@ -280,21 +269,15 @@ namespace std
 	    return routs;
 	};
 	routs = getRoutsList(routs_fname,routsCreator);
-	Scheduler scheduler(stations,lines,routs);
-	result = scheduler.schedule();
-	cout<<"test4 exit result="<<result<<"\n";
-	assert(result==false);
+	runTest(stations,lines,routs,false,TEST4_NAME);
+
     }
 
-    void SchedulerTest::test5_OKFinishersTooMuch ()
+    void SchedulerTest::test5_OKFinishersTooMuch(string& stations_fname, string& lines_fname, string& routs_fname)
     {
-	int result;
 	vector<Station> stations(4);
-	string stations_fname("D:\\tmp3\\test5\\test5_stations.txt");
 	vector<Line> lines(5);
-	string lines_fname("D:\\tmp3\\test5\\test5_net.txt");
 	vector<Rout> routs(3);
-	string routs_fname("D:\\tmp3\\test5\\test5_routs.txt");
 	function<vector<Station>()> stationsCreator = []()->vector<Station>
 	{
 	    vector<Station> stations(4);
@@ -332,20 +315,14 @@ namespace std
 	    return routs;
 	};
 	routs = getRoutsList(routs_fname,routsCreator);
-	Scheduler scheduler(stations,lines,routs);
-	result = scheduler.schedule();
-	cout<<"test5 exit result="<<result<<"\n";
-	assert(result==true);
+	runTest(stations,lines,routs,true,TEST5_NAME);
     }
-    void SchedulerTest::test6_failOnShortRout ()
+
+    void SchedulerTest::test6_failOnShortRout (string& stations_fname, string& lines_fname, string& routs_fname)
     {
-	int result;
 	vector<Station> stations(4);
-	string stations_fname("D:\\tmp3\\test6\\test6_stations.txt");
 	vector<Line> lines(5);
-	string lines_fname("D:\\tmp3\\test6\\test6_net.txt");
 	vector<Rout> routs(3);
-	string routs_fname("D:\\tmp3\\test6\\test6_routs.txt");
 	function<vector<Station>()> stationsCreator = []()->vector<Station>
 	{
 	    vector<Station> stations(4);
@@ -383,20 +360,13 @@ namespace std
 	    return routs;
 	};
 	routs = getRoutsList(routs_fname,routsCreator);
-	Scheduler scheduler(stations,lines,routs);
-	result = scheduler.schedule();
-	cout<<"test6 exit result="<<result<<"\n";
-	assert(result==false);
+	runTest(stations,lines,routs,false,TEST6_NAME);
     }
-    void SchedulerTest::test7_OKMeetingOnStation ()
+    void SchedulerTest::test7_OKMeetingOnStation (string& stations_fname, string& lines_fname, string& routs_fname)
     {
-	int result;
 	vector<Station> stations(4);
-	string stations_fname("D:\\tmp3\\test7\\test7_stations.txt");
 	vector<Line> lines(5);
-	string lines_fname("D:\\tmp3\\test7\\test7_net.txt");
 	vector<Rout> routs(3);
-	string routs_fname("D:\\tmp3\\test7\\test7_routs.txt");
 	function<vector<Station>()> stationsCreator = []()->vector<Station>
 	{
 	    vector<Station> stations(4);
@@ -434,20 +404,51 @@ namespace std
 	    return routs;
 	};
 	routs = getRoutsList(routs_fname,routsCreator);
-	Scheduler scheduler(stations,lines,routs);
-	result = scheduler.schedule();
-	cout<<"test7 exit result="<<result<<"\n";
-	assert(result==true);
+	runTest(stations,lines,routs,true,TEST7_NAME);
     }
-    void SchedulerTest::testAll ()
+*/
+    string SchedulerTest::createFName (string& name, string& testName)
     {
-	test1_failOnLine();
-	test2_failOnStation();
-	test3_OKstartersTooMuch();
-	test4_FailSameLineSameTime();
-	test5_OKFinishersTooMuch();
-	test6_failOnShortRout();
-	test7_OKMeetingOnStation();
+	return testName + "_" + name + ".txt";
     }
+
+    string SchedulerTest::createPath (string& testDir, string& name, string& testName)
+    {
+	boost::filesystem::path path(testDir);
+	string result;
+	string fname = createFName(name,testName);
+	path /= fname;
+	result = path.string();
+	return result;
+    }
+/*
+    void SchedulerTest::prepareFileNames(string& testDir, string& testName, string& stations_fname, string& lines_fname, string& routs_fname)
+    {
+	static string stations_name("stations"),lines_name("lines"),routs_name("routs");
+	stations_fname = createPath(testDir,stations_name,testName);
+	lines_fname = createPath(testDir,lines_name,testName);
+	routs_fname = createPath(testDir,routs_name,testName);
+    }
+
+    void SchedulerTest::testAll (string& testDir)
+    {
+	string stations_fname,lines_fname,routs_fname;
+	prepareFileNames(testDir,TEST1_NAME,stations_fname,lines_fname,routs_fname);
+	test1_failOnLine(stations_fname,lines_fname,routs_fname);
+	prepareFileNames(testDir,TEST2_NAME,stations_fname,lines_fname,routs_fname);
+	test2_failOnStation(stations_fname,lines_fname,routs_fname);
+	prepareFileNames(testDir,TEST3_NAME,stations_fname,lines_fname,routs_fname);
+	test3_OKstartersTooMuch(stations_fname,lines_fname,routs_fname);
+	prepareFileNames(testDir,TEST4_NAME,stations_fname,lines_fname,routs_fname);
+	test4_FailSameLineSameTime(stations_fname,lines_fname,routs_fname);
+	prepareFileNames(testDir,TEST5_NAME,stations_fname,lines_fname,routs_fname);
+	test5_OKFinishersTooMuch(stations_fname,lines_fname,routs_fname);
+	prepareFileNames(testDir,TEST6_NAME,stations_fname,lines_fname,routs_fname);
+	test6_failOnShortRout(stations_fname,lines_fname,routs_fname);
+	prepareFileNames(testDir,TEST7_NAME,stations_fname,lines_fname,routs_fname);
+	test7_OKMeetingOnStation(stations_fname,lines_fname,routs_fname);
+    }
+*/
 } /* namespace std */
+
 
