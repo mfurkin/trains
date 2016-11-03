@@ -16,6 +16,7 @@ namespace std
     typedef function<void(ParamsType& params)> RunProcType;
     typedef function<void(ParamsType& params, int argc, char** argv)> ParserProcType;
     typedef function<vector<Station>()> StationCreatorProcType;
+    typedef function<vector<Line>()> LineCreatorProcType;
     typedef function<vector<Rout>()> RoutCreatorProcType;
 }
 

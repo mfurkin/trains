@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include "Station.h"
+#include "Scheduler.h"
 #include "SchedulerTest.h"
 #include "TrainsMain.h"
 #include "boost/lexical_cast.hpp"
@@ -213,12 +214,10 @@ vector<Rout> getRouts(string& fname, function<vector<Rout>()> defaultDataCreator
 		};
 	if (json.fileExists(fname))
 	{
-	    cout<<"Rout file exists "<<fname<<"\n";
 	    result = json.readRoutsList(fname,readError);
 	}
 	else
 	{
-	    cout<<"Rout file does not exist"<<fname<<"\n";
 	    result = defaultDataCreator();
 	    json.writeRoutsList(fname,result);
 	}
@@ -252,6 +251,7 @@ void showUsage(ParamsType& params)
     cout<<"      <lines_fname>    - input data about net configuration for some case which should be checked \n";
     cout<<"      <stations_fname> - input data about routs for some case which should be checked \n";
     cout<<"\n";
+    cout<<"All file names should be specified with full absoluth paths\n";
     cout<<"trains -showUsage              - prints this instruction\n";
 }
 
@@ -305,7 +305,45 @@ void runTest(ParamsType& params)
 
 void runCheck(ParamsType& params)
 {
-
+    ParamsType::iterator stationsFnameIt,linesFnameIt,routsFnameIt,end = params.end();
+    stationsFnameIt = params.find("stations_fname");
+    linesFnameIt = params.find("lines_fname");
+    routsFnameIt = params.find("routs_fname");
+    if ((stationsFnameIt == end) || (linesFnameIt == end) || (routsFnameIt == end))
+	invalidParamsMessage(params);
+    else
+    {
+	string stationsFname = stationsFnameIt->second,linesFname = linesFnameIt->second,routsFname = routsFnameIt->second;
+	JsonExchanger json;
+	StationCreatorProcType stationsCreator = []()
+	{
+	    cout<<"Stations file have not been found\n";
+	    return vector<Station>();
+	};
+	LineCreatorProcType linesCreator = []()
+	{
+	    cout<<"Net file have not been found\n";
+	    return vector<Line>();
+	};
+	RoutCreatorProcType routsCreator =  []()
+	{
+	    cout<<"Routs file have not been found\n";
+	    return vector<Rout>();
+	};
+	cout<<"stationsFname="<<stationsFname<<" linesFname="<<linesFname<<" routsFname="<<routsFname<<"\n";
+	vector<Station> stations  = getStations(stationsFname,stationsCreator,json);
+	vector<Line> lines = getLines(linesFname,linesCreator,json);
+	vector<Rout> routs = getRouts(routsFname,routsCreator,json);
+	if ((stations.size() == 0) || (lines.size() == 0) ||  (routs.size() == 0))
+	    cout<<"Incorrect file name have been specified\n";
+	else
+	{
+	    cout<<"checking started...\n";
+	    Scheduler scheduler = Scheduler(stations,lines,routs);
+	    bool result = scheduler.schedule();
+	    cout<<((result) ? "schedule is correct" : "schedule failed")<<"\n";
+	}
+    }
 }
 
 void parseTest(ParamsType& params, int argc, char** argv)
@@ -319,7 +357,12 @@ void parseTest(ParamsType& params, int argc, char** argv)
 
 void parseCheck(ParamsType& params,int argc, char** argv)
 {
-// TODO Add parsing for checking task
+    if (argc>4)
+    {
+	params["stations_fname"] = string(argv[2]);
+	params["lines_fname"] = string(argv[3]);
+	params["routs_fname"] = string(argv[4]);
+    }
 }
 
 void parseShowUsage(ParamsType& params, int argc, char** argv)
@@ -345,15 +388,10 @@ int main(int argc, char** argv)
     string TEST_PARAM("-test"),CHECK_PARAM("-check"),SHOW_USAGE_PARAM("-showUsage");
     int result = 0;
     map<string,string> params;
-    cout<<"main enter argc="<<argc<<"\n";
     if (argc == 1)
 	invalidParamsMessage(params);
     else
     {
-	int i;
-	cout<<"Arguments:\n";
-	for (i=0;i<argc;i++)
-	    cout<<"arg["<<i<<"]="<<argv[i]<<"\n";
 	RunProcType action;
 	map<string,RunProcType> actionsByNames;
 	RunProcType func;
