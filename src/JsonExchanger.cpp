@@ -23,7 +23,36 @@ namespace std {
 JsonExchanger::JsonExchanger()
 {
 }
+void JsonExchanger::writeArray (string& fname, vector<Saveable> savedArray)
+{
+    rapidjson::Value array(rapidjson::kArrayType);
+    rapidjson::Value value(rapidjson::kObjectType);
+    rapidjson::Document document;
+    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+/*
+    IntSaver intSaver = [&allocator,&value](string& name, int& data)
+	{
+//	    value.AddMember(rapidjson::StringRef(name),data,allocator);
+	};
+*/
+    for (Saveable obj : savedArray)
+    {
+	rapidjson::Value value(rapidjson::kObjectType);
 
+
+//	array.PushBack(value,allocator);
+    }
+}
+
+void JsonExchanger::writeStations(string& fname, vector<Station> aStations)
+{
+    vector<Saveable> savedArr(aStations.size());
+    int i = 0;
+    for (Station station : aStations)
+	savedArr[i++] = (Saveable)station;
+    writeArray(fname,savedArr);
+}
+/*
 void JsonExchanger::writeStations(string& fname, vector<Station> aStations)
 {
     ofstream ofstr(fname,ios_base::out | ios_base::trunc);
@@ -52,7 +81,7 @@ void JsonExchanger::writeStations(string& fname, vector<Station> aStations)
     rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
     doc.Accept(writer);
 }
-
+*/
 vector<Station> JsonExchanger::readStations(string& fname, function<void(TrainObjectCreatingException&)> onKeyAlreadyExists)
 {
     list<Station> result;

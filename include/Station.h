@@ -16,9 +16,11 @@
 #include "rapidjson/document.h"
 #include "TimeKeeper.h"
 #include "Line.h"
+#include "Saveable.h"
 namespace std {
 
-class Station {
+class Station : public Saveable
+{
 private:
 	string name;
 	static DataKeeper& keeper;

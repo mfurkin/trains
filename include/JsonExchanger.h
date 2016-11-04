@@ -14,6 +14,7 @@
 #include <vector>
 #include "Line.h"
 #include "Rout.h"
+#include "Saveable.h"
 #include "TrainObjectCreatingException.h"
 #define TRAINS_DEBUG
 
@@ -28,6 +29,7 @@ public:
     JsonExchanger();
     int fileExists(string& fname);
     void writeStations(string& fname, vector<Station> aStations);
+    void writeArray(string& fname, vector<Saveable> savedArray);
     void readArray(string& fname, function<void(rapidjson::Value&)> onItem, function<void(TrainObjectCreatingException&)> onError, string& name);
     vector<Station> readStations(string&fname, function<void(TrainObjectCreatingException&)> onKeyAlreadyExists);
     vector<Line> readNet(string& fname, function<void(TrainObjectCreatingException&)> onStationDoesNotExist);
