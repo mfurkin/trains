@@ -9,6 +9,7 @@
 #define INCLUDE_TRAINSMAIN_H_
 #include <functional>
 #include <map>
+#include "JsonExchangerTest.h"
 namespace std
 {
     const int TEST_CASE_NUM = 7;
@@ -18,6 +19,9 @@ namespace std
     typedef function<vector<Station>()> StationCreatorProcType;
     typedef function<vector<Line>()> LineCreatorProcType;
     typedef function<vector<Rout>()> RoutCreatorProcType;
+    typedef function<void(string&, JsonExchangerTest&)> JsonTestActionProcType;
+    typedef map<string,JsonTestActionProcType> JsonTestActionMap;
+    typedef function<JsonTestActionMap(string&)> JsonTestActionFactoryProcType;
 }
 
 

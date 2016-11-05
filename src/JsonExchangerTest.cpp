@@ -8,6 +8,7 @@
 
 
 #include <fstream>
+#include <iostream>
 #include "JsonExchangerTest.h"
 #include "KeyAlreadyExistsException.h"
 #include "Station.h"
@@ -32,11 +33,12 @@ JsonExchangerTest::JsonExchangerTest ()
     routs = vector<Rout>(4);
 }
 
-void JsonExchangerTest::readStationsTest ()
+void JsonExchangerTest::readStationsTest(string& fname)
 {
     int count = 0;
 
-    stationsV = json.readStations(STATIONS_FNAME,[&count](TrainObjectCreatingException& toce)
+//  stationsV = json.readStations(STATIONS_FNAME,[&count](TrainObjectCreatingException& toce)
+    stationsV = json.readStations(fname,[&count](TrainObjectCreatingException& toce)
     {
 	count++;
     });
@@ -54,31 +56,34 @@ void JsonExchangerTest::createStations()
     stationsV[1] = stations[1];
     stationsV[2] = stations[2];
 }
-void JsonExchangerTest::writeStationsTest ()
+void JsonExchangerTest::writeStationsTest(string& fname)
 {
-    if (json.fileExists(STATIONS_FNAME))
-	deleteStationsFile();
+    if (json.fileExists(fname))
+	deleteStationsFile(fname);
     createStations();
-    json.writeStations (STATIONS_FNAME, stationsV);
+    json.writeStations (fname, stationsV);
 }
 
-void JsonExchangerTest::deleteStationsFile ()
+void JsonExchangerTest::deleteStationsFile (string& fname)
 {
-    remove(STATIONS_FNAME.c_str());
+//   remove(STATIONS_FNAME.c_str());
+    remove(fname.c_str());
 }
 
-void JsonExchangerTest::writeNetTest ()
+void JsonExchangerTest::writeNetTest (string& fname)
 {
-    writeStationsTest();
+    writeStationsTest(fname);
     createNet();
-    json.writeNet(LINES_FNAME,linesV);
+//  json.writeNet(LINES_FNAME,linesV);
+    json.writeNet(fname,linesV);
 }
 
 
-void JsonExchangerTest::readNetTest ()
+void JsonExchangerTest::readNetTest (string& fname)
 {
     int count = 0;
-    linesV = json.readNet(LINES_FNAME,[&count](TrainObjectCreatingException& toce)
+//  linesV = json.readNet(LINES_FNAME,[&count](TrainObjectCreatingException& toce)
+    linesV = json.readNet(fname,[&count](TrainObjectCreatingException& toce)
     {
 	int type = toce.getType();
 	if (type == KeyAlreadyExistsException::KEY_ALREADY_EXISTS_TYPE)
@@ -96,10 +101,11 @@ void JsonExchangerTest::createNet ()
     linesV[2] = lines[2];
 }
 
-void JsonExchangerTest::writeRoutsListTest ()
+void JsonExchangerTest::writeRoutsListTest (string& fname)
 {
     createRoutsList();
-    json.writeRoutsList(ROUTS_FNAME,routs);
+//  json.writeRoutsList(ROUTS_FNAME,routs);
+    json.writeRoutsList(fname,routs);
 }
 
 void JsonExchangerTest::createRoutsList ()
@@ -116,9 +122,10 @@ void JsonExchangerTest::createRoutsList ()
     routs[3] = Rout(rout4,250);
 }
 
-void JsonExchangerTest::readRoutsListTest ()
+void JsonExchangerTest::readRoutsListTest (string& fname)
 {
-    vector<Rout> routs2 = json.readRoutsList(ROUTS_FNAME,[](TrainObjectCreatingException& ex) {
+//  vector<Rout> routs2 = json.readRoutsList(ROUTS_FNAME,[](TrainObjectCreatingException& ex) {
+    vector<Rout> routs2 = json.readRoutsList(fname,[](TrainObjectCreatingException& ex) {
 	assert("false");
     });
     unsigned int size = routs.size(), size2 = routs2.size(),i= 0;

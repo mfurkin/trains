@@ -11,6 +11,7 @@
 #include <cstring>
 #include <functional>
 #include <algorithm>
+#include <iostream>
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/allocators.h"
@@ -23,34 +24,63 @@ namespace std {
 JsonExchanger::JsonExchanger()
 {
 }
-void JsonExchanger::writeArray (string& fname, vector<Saveable> savedArray)
+void JsonExchanger::writeArray (string& fname, vector<Saveable*>& savedArray, string& arrayName)
 {
     rapidjson::Value array(rapidjson::kArrayType);
-    rapidjson::Value value(rapidjson::kObjectType);
     rapidjson::Document document;
     rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
-/*
-    IntSaver intSaver = [&allocator,&value](string& name, int& data)
-	{
-//	    value.AddMember(rapidjson::StringRef(name),data,allocator);
-	};
-*/
-    for (Saveable obj : savedArray)
+    ofstream ofstr(fname,ios_base::out | ios_base::trunc);
+    rapidjson::OStreamWrapper osw(ofstr);
+    array.Reserve(savedArray.size(),allocator);
+    for(Saveable* ptr : savedArray)
     {
 	rapidjson::Value value(rapidjson::kObjectType);
-
-
-//	array.PushBack(value,allocator);
+	printf("writeArray ptr=%x\n",ptr);
+	ptr->saveMe([&allocator,&value](string& name, int data)
+	{
+	    value.AddMember(rapidjson::StringRef(name),data,allocator);
+	},
+	[&allocator,&value](string& name, string& data)
+	{
+	    value.AddMember(rapidjson::StringRef(name),data,allocator);
+	},
+	[&allocator,&value](string& name, vector<string>& data)
+	{
+	    rapidjson::Value routArray(rapidjson::kArrayType);
+	    for_each(data.begin(),data.end(),[&routArray,&allocator](string& curStation)
+	    {
+	    	rapidjson::Value routCell(rapidjson::kStringType);
+	  	routCell.SetString(curStation,allocator);
+	  	routArray.PushBack(routCell,allocator);
+	    });
+	    value.AddMember(rapidjson::StringRef(name),routArray,allocator);
+	});
+	array.PushBack(value,allocator);
     }
+    document.SetObject();
+    document.AddMember(rapidjson::StringRef(arrayName),array,allocator);
+    rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
+    document.Accept(writer);
 }
 
-void JsonExchanger::writeStations(string& fname, vector<Station> aStations)
+void JsonExchanger::writeStations(string& fname, vector<Station>& aStations)
 {
-    vector<Saveable> savedArr(aStations.size());
-    int i = 0;
+    int size = aStations.size();
+    vector<Saveable*> savedArr(size);
+    string stationsName("stations");
+    int i;
+    for (i=0;i<size;i++)
+	savedArr[i] = &aStations[i];
+    /*
     for (Station station : aStations)
-	savedArr[i++] = (Saveable)station;
-    writeArray(fname,savedArr);
+    {
+	Saveable* ptr;
+	ptr = &station;
+	printf("writeStations[%d]=%x\n",i,ptr);
+	savedArr[i++] = &station;
+    }
+    */
+    writeArray(fname,savedArr,stationsName);
 }
 /*
 void JsonExchanger::writeStations(string& fname, vector<Station> aStations)
@@ -146,7 +176,21 @@ vector<Line> JsonExchanger::readNet(string& fname, function<void(TrainObjectCrea
     });
     return res2;
 }
-
+void JsonExchanger::writeNet (string& fname, vector<Line> lines)
+{
+    int size = lines.size();
+    vector<Saveable*> savedArr(size);
+    string linesName("lines");
+    int i;
+    for (i=0;i<size;i++)
+	savedArr[i] = &lines[i];
+    /*
+    for (Line line: lines)
+	savedArr[i++] = &line;
+	*/
+    writeArray(fname,savedArr,linesName);
+}
+/*
 void JsonExchanger::writeNet (string& fname, vector<Line> lines)
 {
     rapidjson::Document doc;
@@ -171,7 +215,7 @@ void JsonExchanger::writeNet (string& fname, vector<Line> lines)
     rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
     doc.Accept(writer);
 }
-
+*/
 vector<Rout> JsonExchanger::readRoutsList(string fname, function<void(TrainObjectCreatingException&)> onError)
 {
 
@@ -203,6 +247,21 @@ vector<Rout> JsonExchanger::readRoutsList(string fname, function<void(TrainObjec
 
 void JsonExchanger::writeRoutsList(string fname, vector<Rout> aRouts)
 {
+    int size = aRouts.size();
+    vector<Saveable*> savedArr(size);
+    string routsName("routs");
+    int i;
+    for (i=0;i<size;i++)
+	savedArr[i] = &aRouts[i];
+    /*
+    for (Rout rout: aRouts)
+    	savedArr[i++] = (Saveable*)&rout;
+    	*/
+    writeArray(fname,savedArr,routsName);
+}
+/*
+void JsonExchanger::writeRoutsList(string fname, vector<Rout> aRouts)
+{
     rapidjson::Document doc;
     rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
     rapidjson::Value array(rapidjson::kArrayType);
@@ -230,7 +289,7 @@ void JsonExchanger::writeRoutsList(string fname, vector<Rout> aRouts)
     rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
     doc.Accept(writer);
 }
-
+*/
 JsonExchanger::~JsonExchanger()
 {
 }

@@ -226,7 +226,6 @@ vector<Rout> getRouts(string& fname, function<vector<Rout>()> defaultDataCreator
 void runOneTest(string& testDir,string& testCase, SchedulerTest& test, StationCreatorProcType stationCreator,RoutCreatorProcType routCreator, bool expected_result, string& testName)
 {
     string stations_name("stations"),lines_name("net"),routs_name("routs");
-//  string stations_fname = test.createFName(stations_name,testCase),lines_fname = test.createFName(lines_name,testCase), routs_fname = test.createFName(routs_name,testCase);
     string stations_fname = test.createPath(testDir,stations_name,testCase),lines_fname = test.createPath(testDir,lines_name,testCase), routs_fname = test.createPath(testDir,routs_name,testCase);
     JsonExchanger json;
     vector<Station> stations = getStations(stations_fname,stationCreator,json);
@@ -259,6 +258,105 @@ void invalidParamsMessage(ParamsType& params)
 {
     cout<<"Invalid parameters specified!!!\n";
     showUsage(params);
+}
+
+JsonTestActionMap createJsonWriteActionsMap(string& testType)
+{
+//  map<string,JsonTestActionProcType> result;
+    JsonTestActionMap result;
+    result["stations"] = [](string& fname, JsonExchangerTest& jet)
+	{
+	    jet.writeStationsTest(fname);
+	};
+    result["net"] = [](string& fname, JsonExchangerTest& jet)
+	{
+	    jet.writeNetTest(fname);
+	};
+    result["routs"] = [](string& fname, JsonExchangerTest& jet)
+	{
+	    jet.writeRoutsListTest(fname);
+	};
+    return result;
+}
+
+JsonTestActionMap createJsonReadActionsMap(string& testType)
+{
+ // map<string,JsonTestActionProcType> result;
+    JsonTestActionMap result;
+    result["stations"] = [](string& fname, JsonExchangerTest& jet)
+	{
+	    jet.readStationsTest(fname);
+	};
+    result["net"] = [](string& fname, JsonExchangerTest& jet)
+	{
+	    jet.readNetTest(fname);
+	};
+    result["routs"] = [](string& fname, JsonExchangerTest& jet)
+	{
+	    jet.readRoutsListTest(fname);
+	};
+    return result;
+}
+JsonTestActionFactoryProcType createJsonActionFactory(string& type)
+{
+    map<string,JsonTestActionFactoryProcType> storage;
+    storage["write"] = createJsonWriteActionsMap;
+    storage["read"] = createJsonReadActionsMap;
+    return storage[type];
+}
+void jsonTest(ParamsType& params)
+{
+    cout<<"jsonTest enter\n";
+    ParamsType::iterator end = params.end(), it;
+    it = params.find("jsonTestType");
+    if (it == end)
+    {
+	cout<<"test type have not been found!!\n";
+	invalidParamsMessage(params);
+    }
+    else
+    {
+	JsonExchangerTest jet;
+	string testType = it->second;
+	ParamsType::iterator dataTypeIt = params.find("jsonDataType");
+	if (dataTypeIt == end)
+	{
+	    cout<<"Data type have not been found!\n";
+	    invalidParamsMessage(params);
+	}
+	else
+	{
+	    string dataType = dataTypeIt->second;
+	    JsonTestActionFactoryProcType factory = createJsonActionFactory(testType);
+	    JsonTestActionMap actionsMap = factory(dataType);
+	    if (dataType != "all")
+	    {
+		JsonTestActionProcType proc = actionsMap[dataType];
+		ParamsType::iterator fnameIt = params.find("filename");
+		if (fnameIt == end)
+		{
+		    cout<<"File name have not been found!!\n";
+		    invalidParamsMessage(params);
+		}
+		else
+		    proc(fnameIt->second,jet);
+	    }
+	    else
+	    {
+		ParamsType::iterator stationsFnameIt = params.find("stations_fname"),linesFnameIt = params.find("lines_fname"),
+				     routsFnameIt = params.find("routs_fname");
+		if ((stationsFnameIt == end) || (linesFnameIt == end) || (routsFnameIt == end))
+		    invalidParamsMessage(params);
+		else
+		{
+		    JsonTestActionProcType stationsProc = actionsMap["stations"], netProc = actionsMap["net"], routsProc = actionsMap["routs"];
+		    stationsProc(stationsFnameIt->second,jet);
+		    netProc(linesFnameIt->second,jet);
+		    routsProc(routsFnameIt->second,jet);
+		}
+	    }
+	}
+    }
 }
 
 void runTest(ParamsType& params)
@@ -369,6 +467,28 @@ void parseShowUsage(ParamsType& params, int argc, char** argv)
 {
 
 }
+
+void parseJsonTest(ParamsType& params, int argc, char** argv)
+{
+    if (argc > 3)
+    {
+	params["jsonTestType"] = string(argv[2]);
+	string jsonDataType = string(argv[3]);
+	params["jsonDataType"] = jsonDataType;
+	if (jsonDataType != "all")
+	{
+	    if (argc > 3)
+		params["filename"] = string(argv[4]);
+	}
+	else
+	    if (argc > 6)
+	    {
+		params["stations_fname"] = argv[4];
+		params["lines_fname"] = argv[5];
+		params["routs_fname"] = argv[6];
+	    }
+    }
+}
 RunProcType decodeFirstParam(int argc, char** argv, ParamsType& params, map<string,RunProcType> decoder, map<string, ParserProcType> parser)
 {
     RunProcType result = invalidParamsMessage;
@@ -385,7 +505,8 @@ RunProcType decodeFirstParam(int argc, char** argv, ParamsType& params, map<stri
 
 int main(int argc, char** argv)
 {
-    string TEST_PARAM("-test"),CHECK_PARAM("-check"),SHOW_USAGE_PARAM("-showUsage");
+    string TEST_PARAM("-test"),CHECK_PARAM("-check"),SHOW_USAGE_PARAM("-showUsage"),
+	   JSON_TEST_PARAM("-jsonTest");
     int result = 0;
     map<string,string> params;
     if (argc == 1)
@@ -402,9 +523,11 @@ int main(int argc, char** argv)
 	decoder[TEST_PARAM] = runTest;
 	decoder[CHECK_PARAM] = runCheck;
 	decoder[SHOW_USAGE_PARAM] = showUsage;
+	decoder[JSON_TEST_PARAM] = jsonTest;
 	parser[TEST_PARAM] = parseTest;
 	parser[CHECK_PARAM] = parseCheck;
 	parser[SHOW_USAGE_PARAM] = parseShowUsage;
+	parser[JSON_TEST_PARAM] = parseJsonTest;
 	action = decodeFirstParam(argc,argv,params,decoder,parser);
 	action(params);
 	cout<<"main exit\n";

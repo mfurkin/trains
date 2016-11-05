@@ -11,6 +11,9 @@
 namespace std
 {
 DataKeeper& Line::keeper = DataKeeper::getKeeper();
+string Line::FIRST_STATION_FIELD_NAME = string("firstStation");
+string Line::SECOND_STATION_FIELD_NAME = string("secondStation");
+string Line::LENGTH_FIELD_NAME = string("length");
 Line::Line ()
 {
 }
@@ -45,12 +48,19 @@ string Line::getLineName (string& aFirst, string& aSecond)
      strcat(buf,aSecond.c_str());
      return string(buf);;
 }
+void Line::saveMe(IntSaver anIntSaver, StringSaver aStringSaver, StringArraySaver aStrArrSaver)
+{
+    aStringSaver(FIRST_STATION_FIELD_NAME,firstStation);
+    aStringSaver(SECOND_STATION_FIELD_NAME,secondStation);
+    anIntSaver(LENGTH_FIELD_NAME,getLength());
+}
+/*
 void Line::saveMe (rapidjson::Value& array, function<void(rapidjson::Value& array, string&, string&, int)> aDataSaver)
 {
     int length = getLength();
     aDataSaver(array,firstStation,secondStation,length);
 }
-
+*/
 void Line::checkStation (string& station)
 {
     if (!(keeper.exists(station)))

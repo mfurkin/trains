@@ -24,9 +24,9 @@ class Station : public Saveable
 private:
 	string name;
 	static DataKeeper& keeper;
+	static string NAME_FIELD_NAME, WAYS_QTY_FIELD_NAME;
 	int getWaysQty () const;
 public:
-	static const string STATION_NAME;
 	Station();
 	Station(const Station& aStation);
 	Station(string& aStation);
@@ -38,7 +38,8 @@ public:
 	int checkOnStation(time_t aTime, TimeKeeper& timeKeeper);
 	time_t addTime(time_t time, string& nextStation, TimeKeeper& timeKeeper);
 	void addMe(map<string,Station>& aMap);
-	void saveMe(rapidjson::Value& array, function<void(rapidjson::Value&, string&, int)> aDataSaver);
+	void saveMe(IntSaver anIntSaver, StringSaver aStringSaver, StringArraySaver aStrArrSaver);
+//	void saveMe(rapidjson::Value& array, function<void(rapidjson::Value&, string&, int)> aDataSaver);
     };
 
 } /* namespace std */

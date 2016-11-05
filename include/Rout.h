@@ -15,8 +15,9 @@
 #include "Station.h"
 namespace std {
 
-class Rout {
+class Rout : public Saveable {
 private:
+	static string START_TIME_FIELD_NAME,ROUT_FIELD_NAME;
 	vector<string> rout;
 	time_t startTime;
 public:
@@ -26,7 +27,8 @@ public:
 	int scheduleRout(map<string, Station> aStations, map<string, Line>& lines, TimeKeeper& timeKeeper);
 	int operator == (Rout& aRout);
 	Rout& operator =(const Rout& aRout);
-	void saveMe(rapidjson::Value& array, function<void(rapidjson::Value& array, vector<string>& aRout, time_t aTime)> aDataSaver);
+	void saveMe(IntSaver anIntSaver, StringSaver aStringSaver, StringArraySaver aStrArrSaver);
+//	void saveMe(rapidjson::Value& array, function<void(rapidjson::Value& array, vector<string>& aRout, time_t aTime)> aDataSaver);
 	virtual ~Rout();
 };
 

@@ -28,18 +28,18 @@ private:
     static string LINES_FNAME;
     static string STATION_C_NAME;
     static string ROUTS_FNAME;
-    void deleteStationsFile();
+    void deleteStationsFile(string& fname);
     void createStations();
     void createNet();
     void createRoutsList();
 public:
     JsonExchangerTest ();
-    void readStationsTest();
-    void writeStationsTest();
-    void readNetTest();
-    void writeNetTest();
-    void writeRoutsListTest();
-    void readRoutsListTest();
+    void readStationsTest(string& fname);
+    void writeStationsTest(string& fname);
+    void readNetTest(string& fname);
+    void writeNetTest(string& fname);
+    void writeRoutsListTest(string& fname);
+    void readRoutsListTest(string& fname);
     virtual ~JsonExchangerTest();
 };
 }

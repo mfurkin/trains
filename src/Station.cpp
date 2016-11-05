@@ -9,12 +9,13 @@
 #include "DataKeeper.h"
 #include "Line.h"
 #include "Station.h"
-
+#include <iostream>
 
 namespace std {
 
 DataKeeper& Station::keeper = DataKeeper::getKeeper();
-
+string Station::NAME_FIELD_NAME = string("name");
+string Station::WAYS_QTY_FIELD_NAME = string("waysQty");
 Station::Station ():name("noname")
 {
 }
@@ -73,13 +74,17 @@ void Station::addMe (map<string, Station>& aMap)
 {
     aMap[name] = *this;
 }
-
+/*
 void Station::saveMe(rapidjson::Value& array, function<void(rapidjson::Value&, string&, int)> aDataSaver)
 {
     aDataSaver(array,name,getWaysQty());
 }
-
-
+*/
+void Station::saveMe (IntSaver anIntSaver, StringSaver aStringSaver, StringArraySaver aStrArrSaver)
+{
+    aStringSaver(NAME_FIELD_NAME,name);
+    anIntSaver(WAYS_QTY_FIELD_NAME,getWaysQty());
+}
 } /* namespace std */
 
 
