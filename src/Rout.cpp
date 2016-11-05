@@ -6,7 +6,7 @@
  */
 
 #include "Rout.h"
-#include <iostream>
+
 namespace std {
     string Rout::START_TIME_FIELD_NAME = string("startTime");
     string Rout::ROUT_FIELD_NAME = string("rout");
@@ -20,7 +20,7 @@ namespace std {
 
     }
 
-    Rout::Rout(vector<string>& aRout, time_t aStartTime):rout(aRout),startTime(aStartTime)
+    Rout::Rout(vector<string> aRout, time_t aStartTime):rout(aRout),startTime(aStartTime)
     {
     }
 
@@ -97,11 +97,8 @@ namespace std {
 
     void Rout::saveMe (IntSaver anIntSaver, StringSaver aStringSaver, StringArraySaver aStrArrSaver)
     {
-	cout<<"Rout.saveMe enter\n";
 	anIntSaver(START_TIME_FIELD_NAME,startTime);
-	cout<<"Rout.saveMe pt1\n";
 	aStrArrSaver(ROUT_FIELD_NAME,rout);
-	cout<<"Rout.saveMe exit\n";
     }
 
 } /* namespace std */

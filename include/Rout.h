@@ -23,7 +23,7 @@ private:
 public:
 	Rout();
 	Rout(const Rout& aRout);
-	Rout(vector<string>& aRout, time_t aStartTime);
+	Rout(vector<string> aRout, time_t aStartTime);
 	int scheduleRout(map<string, Station> aStations, map<string, Line>& lines, TimeKeeper& timeKeeper);
 	int operator == (Rout& aRout);
 	Rout& operator =(const Rout& aRout);

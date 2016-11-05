@@ -24,9 +24,9 @@ class Station : public Saveable
 private:
 	string name;
 	static DataKeeper& keeper;
-	static string NAME_FIELD_NAME, WAYS_QTY_FIELD_NAME;
 	int getWaysQty () const;
 public:
+	static string NAME_FIELD_NAME, WAYS_QTY_FIELD_NAME;
 	Station();
 	Station(const Station& aStation);
 	Station(string& aStation);

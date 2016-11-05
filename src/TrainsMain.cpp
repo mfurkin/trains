@@ -250,6 +250,16 @@ void showUsage(ParamsType& params)
     cout<<"      <lines_fname>    - input data about net configuration for some case which should be checked \n";
     cout<<"      <stations_fname> - input data about routs for some case which should be checked \n";
     cout<<"\n";
+    cout<<"trains -jsonTest <testType> <dataType> <fname.txt>                            - tests JsonExchanger class \n";
+    cout<<"	<testType> - could be \"write\" or \"read\" for file writing or reading tests respectively.\n";
+    cout<<" 	<dataType> - coulde be \"stations\", \"net\",  \"routs\" or \"all\" for specified data writing/reading test. Usage for \"all\" see as follows\n";
+    cout<<" 	<filename> - file absoluth path for JSON writing/reading test\n";
+    cout<<"\n";
+    cout<<"trains -jsonTest <testType> <dataType> <stations_fname.txt> <net_fname.txt <routs_fname.txt>\n - tests for all data types\n";
+    cout<<"<stations_fname> - absoluth path for file that contains stations information\n";
+    cout<<"<net_fname> - absoluth path for file that contains net configuration information\n";
+    cout<<"<routs_fname> - absoluth path for file that contains routs information\n";
+    cout<<"\n";
     cout<<"All file names should be specified with full absoluth paths\n";
     cout<<"trains -showUsage              - prints this instruction\n";
 }
@@ -306,12 +316,10 @@ JsonTestActionFactoryProcType createJsonActionFactory(string& type)
 }
 void jsonTest(ParamsType& params)
 {
-    cout<<"jsonTest enter\n";
     ParamsType::iterator end = params.end(), it;
     it = params.find("jsonTestType");
     if (it == end)
     {
-	cout<<"test type have not been found!!\n";
 	invalidParamsMessage(params);
     }
     else
@@ -321,7 +329,6 @@ void jsonTest(ParamsType& params)
 	ParamsType::iterator dataTypeIt = params.find("jsonDataType");
 	if (dataTypeIt == end)
 	{
-	    cout<<"Data type have not been found!\n";
 	    invalidParamsMessage(params);
 	}
 	else
@@ -334,10 +341,7 @@ void jsonTest(ParamsType& params)
 		JsonTestActionProcType proc = actionsMap[dataType];
 		ParamsType::iterator fnameIt = params.find("filename");
 		if (fnameIt == end)
-		{
-		    cout<<"File name have not been found!!\n";
 		    invalidParamsMessage(params);
-		}
 		else
 		    proc(fnameIt->second,jet);
 	    }
@@ -477,7 +481,7 @@ void parseJsonTest(ParamsType& params, int argc, char** argv)
 	params["jsonDataType"] = jsonDataType;
 	if (jsonDataType != "all")
 	{
-	    if (argc > 3)
+	    if (argc > 4)
 		params["filename"] = string(argv[4]);
 	}
 	else
@@ -530,7 +534,6 @@ int main(int argc, char** argv)
 	parser[JSON_TEST_PARAM] = parseJsonTest;
 	action = decodeFirstParam(argc,argv,params,decoder,parser);
 	action(params);
-	cout<<"main exit\n";
     }
     return result;
 }

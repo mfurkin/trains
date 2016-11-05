@@ -11,7 +11,6 @@
 #include <cstring>
 #include <functional>
 #include <algorithm>
-#include <iostream>
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/allocators.h"
@@ -71,47 +70,9 @@ void JsonExchanger::writeStations(string& fname, vector<Station>& aStations)
     int i;
     for (i=0;i<size;i++)
 	savedArr[i] = &aStations[i];
-    /*
-    for (Station station : aStations)
-    {
-	Saveable* ptr;
-	ptr = &station;
-	printf("writeStations[%d]=%x\n",i,ptr);
-	savedArr[i++] = &station;
-    }
-    */
     writeArray(fname,savedArr,stationsName);
 }
-/*
-void JsonExchanger::writeStations(string& fname, vector<Station> aStations)
-{
-    ofstream ofstr(fname,ios_base::out | ios_base::trunc);
-    rapidjson::Document doc;
-    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-    rapidjson::Value array(rapidjson::kArrayType);
-    vector<Station>::iterator it,end = aStations.end();
-    rapidjson::OStreamWrapper osw(ofstr);
-    rapidjson::Value curVal,obj;
-    function<void(rapidjson::Value&, string& name, int waysQty)> funcDataSaver = [&allocator] (rapidjson::Value& anArray, string& name, int waysQty)
-    {
-	rapidjson::Value curVal(rapidjson::kObjectType);
-	curVal.AddMember("name",name,allocator);
-	curVal.AddMember("waysQuantity",waysQty,allocator);
-	anArray.PushBack(curVal,allocator);
-    };
-    array.Reserve(aStations.size(),allocator);
-    it=aStations.begin();
 
-    for_each(aStations.begin(),aStations.end(), [&array,funcDataSaver] (Station curStation) mutable
-    {
-	curStation.saveMe(array,funcDataSaver);
-    });
-    doc.SetObject();
-    doc.AddMember("stations",array,allocator);
-    rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
-    doc.Accept(writer);
-}
-*/
 vector<Station> JsonExchanger::readStations(string& fname, function<void(TrainObjectCreatingException&)> onKeyAlreadyExists)
 {
     list<Station> result;
@@ -119,7 +80,10 @@ vector<Station> JsonExchanger::readStations(string& fname, function<void(TrainOb
     int i = 0;
     function<void(rapidjson::Value& curVal)> funcDataReader = [&result](rapidjson::Value& curVal)
     {
-	result.push_back(Station(curVal["name"].GetString(),curVal["waysQuantity"].GetInt()));
+	int waysQty;
+	string name = curVal[Station::NAME_FIELD_NAME].GetString();
+	waysQty = curVal[Station::WAYS_QTY_FIELD_NAME].GetInt();
+	result.push_back(Station(name,waysQty));
     };
     readArray(fname,funcDataReader,onKeyAlreadyExists,name);
     vector<Station> res2(result.size());
@@ -184,38 +148,9 @@ void JsonExchanger::writeNet (string& fname, vector<Line> lines)
     int i;
     for (i=0;i<size;i++)
 	savedArr[i] = &lines[i];
-    /*
-    for (Line line: lines)
-	savedArr[i++] = &line;
-	*/
     writeArray(fname,savedArr,linesName);
 }
-/*
-void JsonExchanger::writeNet (string& fname, vector<Line> lines)
-{
-    rapidjson::Document doc;
-    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-    rapidjson::Value array(rapidjson::kArrayType);
-    rapidjson::Value line(rapidjson::kArrayType);
-    ofstream ofstr(fname);
-    rapidjson::OStreamWrapper osw(ofstr);
-    doc.SetObject();
-    for_each(lines.begin(), lines.end(), [&array,&allocator] (Line& curLine)
-    {
-	curLine.saveMe(array,[&allocator](rapidjson::Value& anArray, string& aFirstStation, string& aSecondStation, int aLength)
-	{
-	    rapidjson::Value cell(rapidjson::kObjectType);
-	    cell.AddMember("firstStation",aFirstStation,allocator);
-	    cell.AddMember("secondStation",aSecondStation,allocator);
-	    cell.AddMember("length",aLength,allocator);
-	    anArray.PushBack(cell,allocator);
-	});
-    });
-    doc.AddMember("lines",array,allocator);
-    rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
-    doc.Accept(writer);
-}
-*/
+
 vector<Rout> JsonExchanger::readRoutsList(string fname, function<void(TrainObjectCreatingException&)> onError)
 {
 
@@ -224,13 +159,15 @@ vector<Rout> JsonExchanger::readRoutsList(string fname, function<void(TrainObjec
 	function<void(rapidjson::Value&)> funcDataReader= [&res2](rapidjson::Value& curVal)
 	{
 	    rapidjson::Value curArray;
-	    int i = 0;
+	    int i = 0,size;
 	    time_t time = curVal["startTime"].GetInt();
 	    curArray = curVal["rout"].GetArray();
-	    vector<string> rout(curArray.Size());
+	    size = curArray.Size();
+	    vector<string> rout(size);
 	    for_each(curArray.Begin(),curArray.End(),[&i,&rout](rapidjson::Value& arrValue)
 	    {
-		rout[i++] = arrValue.GetString();
+		string st = arrValue.GetString();
+		rout[i++] = st;
 	    });
 	    res2.push_back(Rout(rout,time));
 	};
@@ -253,43 +190,9 @@ void JsonExchanger::writeRoutsList(string fname, vector<Rout> aRouts)
     int i;
     for (i=0;i<size;i++)
 	savedArr[i] = &aRouts[i];
-    /*
-    for (Rout rout: aRouts)
-    	savedArr[i++] = (Saveable*)&rout;
-    	*/
     writeArray(fname,savedArr,routsName);
 }
-/*
-void JsonExchanger::writeRoutsList(string fname, vector<Rout> aRouts)
-{
-    rapidjson::Document doc;
-    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-    rapidjson::Value array(rapidjson::kArrayType);
-    rapidjson::Value line(rapidjson::kArrayType);
-    ofstream ofstr(fname);
-    rapidjson::OStreamWrapper osw(ofstr);
-    doc.SetObject();
-    for_each(aRouts.begin(), aRouts.end(), [&array,&allocator] (Rout& curRout)
-    {
-	curRout.saveMe(array,[&allocator](rapidjson::Value& array, vector<string>& rout, time_t aTime)
-	{
-	    rapidjson::Value cell(rapidjson::kObjectType), routArray(rapidjson::kArrayType);
-	    cell.AddMember("startTime",(unsigned int)aTime,allocator);
-	    for_each(rout.begin(),rout.end(),[&routArray,&allocator](string& curStation)
-	    {
-		rapidjson::Value routCell(rapidjson::kStringType);
-		routCell.SetString(curStation,allocator);
-		routArray.PushBack(routCell,allocator);
-	    });
-	    cell.AddMember("rout",routArray,allocator);
-	    array.PushBack(cell,allocator);
-	});
-    });
-    doc.AddMember("routs",array,allocator);
-    rapidjson::Writer<rapidjson::OStreamWrapper> writer(osw);
-    doc.Accept(writer);
-}
-*/
+
 JsonExchanger::~JsonExchanger()
 {
 }

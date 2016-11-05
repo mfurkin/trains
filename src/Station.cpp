@@ -9,13 +9,13 @@
 #include "DataKeeper.h"
 #include "Line.h"
 #include "Station.h"
-#include <iostream>
+
 
 namespace std {
 
 DataKeeper& Station::keeper = DataKeeper::getKeeper();
 string Station::NAME_FIELD_NAME = string("name");
-string Station::WAYS_QTY_FIELD_NAME = string("waysQty");
+string Station::WAYS_QTY_FIELD_NAME = string("waysQuantity");
 Station::Station ():name("noname")
 {
 }

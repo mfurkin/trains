@@ -14,12 +14,11 @@
 #include "Station.h"
 namespace std
 {
-    string JsonExchangerTest::STATIONS_FNAME = "D:\\tmp3\\stations.txt";
+
     string JsonExchangerTest::STATION_A_NAME = "StationA";
     string JsonExchangerTest::STATION_B_NAME = "StationB";
     string JsonExchangerTest::STATION_C_NAME = "StationC";
-    string JsonExchangerTest::LINES_FNAME = "D:\\tmp3\\lines.txt";
-    string JsonExchangerTest::ROUTS_FNAME = "D:\\tmp3\\routs.txt";
+
 JsonExchangerTest::JsonExchangerTest ()
 {
     stations[0] = Station (STATION_A_NAME, 2);
@@ -30,21 +29,21 @@ JsonExchangerTest::JsonExchangerTest ()
     lines[2] = Line (STATION_A_NAME, STATION_C_NAME, 30);
     stationsV = vector<Station>(3);
     linesV = vector<Line>(3);
-    routs = vector<Rout>(4);
+    routs.resize(4);
+    createRoutsList();
 }
 
 void JsonExchangerTest::readStationsTest(string& fname)
 {
     int count = 0;
 
-//  stationsV = json.readStations(STATIONS_FNAME,[&count](TrainObjectCreatingException& toce)
     stationsV = json.readStations(fname,[&count](TrainObjectCreatingException& toce)
     {
 	count++;
     });
 
     assert(count == 3);
-
+    cout<<"readStationsTest passed\n";
 }
 
 void JsonExchangerTest::createStations()
@@ -66,7 +65,6 @@ void JsonExchangerTest::writeStationsTest(string& fname)
 
 void JsonExchangerTest::deleteStationsFile (string& fname)
 {
-//   remove(STATIONS_FNAME.c_str());
     remove(fname.c_str());
 }
 
@@ -74,7 +72,6 @@ void JsonExchangerTest::writeNetTest (string& fname)
 {
     writeStationsTest(fname);
     createNet();
-//  json.writeNet(LINES_FNAME,linesV);
     json.writeNet(fname,linesV);
 }
 
@@ -91,7 +88,7 @@ void JsonExchangerTest::readNetTest (string& fname)
 	else
 	    assert(false);
     });
-
+    cout<<"readNetTest passed\n";
 }
 
 void JsonExchangerTest::createNet ()
@@ -104,7 +101,6 @@ void JsonExchangerTest::createNet ()
 void JsonExchangerTest::writeRoutsListTest (string& fname)
 {
     createRoutsList();
-//  json.writeRoutsList(ROUTS_FNAME,routs);
     json.writeRoutsList(fname,routs);
 }
 
@@ -115,7 +111,6 @@ void JsonExchangerTest::createRoutsList ()
     rout2 = {"StationA","StationC","StationB"};
     rout3 = {"StationA","StaionB","StationC","StationA"};
     rout4 = {"StationA","StationC","StationB","StationA"};
-
     routs[0] = Rout(rout1,100);
     routs[1] = Rout(rout2,150);
     routs[2] = Rout(rout3,190);
@@ -124,16 +119,16 @@ void JsonExchangerTest::createRoutsList ()
 
 void JsonExchangerTest::readRoutsListTest (string& fname)
 {
-//  vector<Rout> routs2 = json.readRoutsList(ROUTS_FNAME,[](TrainObjectCreatingException& ex) {
     vector<Rout> routs2 = json.readRoutsList(fname,[](TrainObjectCreatingException& ex) {
 	assert("false");
     });
     unsigned int size = routs.size(), size2 = routs2.size(),i= 0;
     assert(size2 == size);
-    for (i=0;i<size;)
+    for (i=0;i<size;i++)
     {
 	assert(routs[i] == routs2[i]);
     }
+    cout<<"readRoutsTest passed\n";
 }
 
 JsonExchangerTest::~JsonExchangerTest ()
