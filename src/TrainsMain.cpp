@@ -248,7 +248,7 @@ void showUsage(ParamsType& params)
     cout<<"trains -check <stations_fname> <lines_fname> <routs_fname>                                - checks some schedules for failures \n";
     cout<<"      <stations_fname> - input data about stations for some case which should be checked \n";
     cout<<"      <lines_fname>    - input data about net configuration for some case which should be checked \n";
-    cout<<"      <stations_fname> - input data about routs for some case which should be checked \n";
+    cout<<"      <routs_fname> - input data about routs for some case which should be checked \n";
     cout<<"\n";
     cout<<"trains -jsonTest <testType> <dataType> <fname.txt>                            - tests JsonExchanger class \n";
     cout<<"	<testType> - could be \"write\" or \"read\" for file writing or reading tests respectively.\n";
